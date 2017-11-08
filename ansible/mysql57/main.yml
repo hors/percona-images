@@ -85,11 +85,12 @@
     - name: Configurator               | Delete empty authorized_keys
       copy:
         content: |
-          runcmd:
-            - [ 'chmod', 'o+x', '/home/admin', '/home/admin/.ssh' ]
-            - [ 'sh', '-c', 'test -s /home/admin/.ssh/authorized_keys || rm -f /home/admin/.ssh/authorized_keys' ]
-        dest: /etc/cloud/cloud.cfg.d/80_delete-empty-authorized-keys.cfg
-        mode: 0644
+          #!/bin/sh
+
+          chmod o+x /home/admin /home/admin/.ssh
+          test -s /home/admin/.ssh/authorized_keys || rm -f /home/admin/.ssh/authorized_keys
+        dest: /var/lib/cloud/scripts/per-boot/change-admin-home
+        mode: 0755
 
     - name: Configurator               | Config
       copy:
@@ -123,3 +124,5 @@
         state: yes
         persistent: yes
 
+    - name: Grub                       | Set noop I/O scheduler
+      command: grubby --update-kernel=ALL --args=elevator=noop

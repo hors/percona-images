@@ -78,6 +78,7 @@
       mysql_db:
         name: orchestrator
         state: present
+        login_unix_socket: /srv/mysql/mysql.sock
 
     - name: Orchestrator               | Create MySQL user
       mysql_user:
@@ -87,11 +88,13 @@
         priv: 'orchestrator.*:ALL'
         encrypted: yes
         state: present
+        login_unix_socket: /srv/mysql/mysql.sock
 
     - name: qan-api                    | Create MySQL database
       mysql_db:
         name: pmm
         state: present
+        login_unix_socket: /srv/mysql/mysql.sock
       register: pmm_db
 
     - name: qan-api                    | Import MySQL database
@@ -100,6 +103,7 @@
         name: pmm
         state: import
         target: /usr/share/percona-qan-api/schema/pmm.sql
+        login_unix_socket: /srv/mysql/mysql.sock
 
     - name: qan-api                    | Create MySQL user
       mysql_user:
@@ -109,6 +113,7 @@
         priv: 'pmm.*:ALL'
         encrypted: yes
         state: present
+        login_unix_socket: /srv/mysql/mysql.sock
 
     - name: PMM                        | Fix nginx config
       replace:
@@ -302,9 +307,6 @@
         regexp: 'input-group hidden ssh'
         replace: 'input-group ssh'
 
-    - name: PMM                        | Delete centos
-      shell: cd /tmp; nohup sh -c "trap 'userdel -r centos' EXIT; sleep 600" </dev/null >/dev/null 2>&1 &
-
-    - name: PMM                        | Delete vagrant
-      shell: cd /tmp; nohup sh -c "trap 'userdel -r vagrant' EXIT; sleep 600" </dev/null >/dev/null 2>&1 &
+    - name: PMM                        | Create tmp dirs
+      command: /bin/bash -c "curl https://raw.githubusercontent.com/chef/bento/master/centos/scripts/cleanup.sh -o cleanup.sh && bash -x cleanup.sh"
 

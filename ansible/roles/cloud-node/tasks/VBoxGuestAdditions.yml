@@ -8,6 +8,7 @@
       when: iso_file.stat.exists and ansible_os_family == 'RedHat'
       yum: name={{ item }} state=installed
       with_items:
+        - kernel-headers
         - kernel-devel
         - dkms
         - gcc
@@ -30,7 +31,7 @@
 
     - name: VBoxGuestAdditions         | Build and install
       when: iso_file.stat.exists
-      shell: /bin/bash /media/VBoxLinuxAdditions.run --nox11
+      shell: /bin/bash -c "env PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin bash /media/VBoxLinuxAdditions.run --nox11 || ( cat /var/log/vboxadd-install.log; exit 1)"
 
     - name: VBoxGuestAdditions         | Unmount
       when: iso_file.stat.exists

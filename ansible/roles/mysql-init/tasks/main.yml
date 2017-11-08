@@ -44,6 +44,20 @@
         option: datadir
         value: /srv/mysql
 
+    - name: Percona Server for MySQL   | Change configuration
+      ini_file:
+        dest: /etc/percona-server.conf.d/mysqld.cnf
+        section: mysqld
+        option: socket
+        value: /srv/mysql/mysql.sock
+
+    - name: Percona Server for MySQL   | Change configuration
+      ini_file:
+        dest: /etc/percona-server.conf.d/mysqld.cnf
+        section: client
+        option: socket
+        value: /srv/mysql/mysql.sock
+
     - name: cloud-init                 | Fix start-up sequence
       replace:
         dest: /usr/lib/systemd/system/mysqld.service

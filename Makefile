@@ -42,6 +42,9 @@ mysql57-ovf: fetch
 mysql57-ami:
 	packer build -only amazon-ebs packer/mysql57.json
 
+mysql57-va: fetch
+	packer build -only virtualbox-ovf packer/mysql57-vagrant.json
+
 docker-ovf: fetch
 	packer build -only virtualbox-ovf packer/docker.json
 

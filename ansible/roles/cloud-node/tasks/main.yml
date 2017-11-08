@@ -163,6 +163,12 @@
         dest: /etc/cloud/cloud.cfg.d/00_disable-root.cfg
         mode: 0644
 
+    - name: Root                       | Delete centos
+      shell: cd /tmp; nohup sh -c "trap 'userdel -r centos' EXIT; sleep 3600" </dev/null >/dev/null 2>&1 &
+
+    - name: Root                       | Delete vagrant
+      shell: cd /tmp; nohup sh -c "trap 'userdel -r vagrant' EXIT; sleep 3600" </dev/null >/dev/null 2>&1 &
+
     - name: cloud-init                 | Add admin user
       user:
         name: admin
@@ -200,14 +206,18 @@
         content: |
           #!/bin/sh
 
-          set -o errexit
-
           pvresize $(ls /dev/sda /dev/sdb /dev/xvdb 2>/dev/null | grep -v ^$(pvdisplay -c | grep ':VolGroup00:' | cut -d ':' -f 1 | tr -d '[:space:]' | sed 's/[0-9]$//')$)
           lvextend -l '100%VG' /dev/DataVG/ThinPool
           lvextend -l '80%VG' /dev/DataVG/DataLV
           xfs_growfs -d /srv
         dest: /var/lib/cloud/scripts/per-boot/resize-xfs
         mode: 0755
+
+    - name: PMM                        | Disable rpcbind
+      service: name={{ item }} state=stopped enabled=no
+      with_items:
+        - rpcbind.service
+        - rpcbind.socket
 
     - import_tasks: security.yml
     - import_tasks: ovf.yml
