@@ -49,9 +49,25 @@
             "vboxmanage": [
                 ["modifyvm", "{{.Name}}", "--memory", "1024"],
                 ["modifyvm", "{{.Name}}", "--audio", "none"],
+                ["modifyvm", "{{.Name}}", "--vrde", "off"],
                 ["createhd", "--format", "VMDK", "--filename", "/tmp/{{.Name}}-disk2.vmdk", "--variant", "STREAM", "--size", "409600"],
                 ["storagectl", "{{.Name}}", "--name", "SATA Controller", "--add", "sata", "--controller", "IntelAHCI"],
-                ["storageattach", "{{.Name}}", "--storagectl", "SATA Controller", "--port", "1", "--type", "hdd", "--medium", "/tmp/{{.Name}}-disk2.vmdk"]
+                ["storageattach", "{{.Name}}", "--storagectl", "SATA Controller", "--port", "1", "--type", "hdd", "--medium", "/tmp/{{.Name}}-disk2.vmdk"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "ssh,tcp,,22,,22"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "web,tcp,,80,,80"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "ssl,tcp,,443,,443"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "mysql,tcp,,3306,,3306"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm0,tcp,,42000,,42000"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm1,tcp,,42001,,42001"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm2,tcp,,42002,,42002"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm3,tcp,,42003,,42003"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm4,tcp,,42004,,42004"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm5,tcp,,42005,,42005"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm6,tcp,,42006,,42006"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm7,tcp,,42007,,42007"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm8,tcp,,42008,,42008"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm9,tcp,,42009,,42009"],
+                ["modifyvm", "{{.Name}}", "--natpf1", "pmm10,tcp,,42010,,42010"]
             ]
         }
     ],
