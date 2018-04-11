@@ -129,7 +129,7 @@
                 "type": "vagrant-cloud",
                 "only": ["virtualbox-ovf"],
                 "box_tag": "perconalab/percona-server",
-                "version": "{{isotime \"20060102.15\"}}"
+                "version": "{{isotime \"2006010215\"}}"
             }
         ]
     ]
