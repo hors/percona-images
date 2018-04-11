@@ -235,12 +235,12 @@
         regexp: 'ResourceDisk.SwapSizeMB=0'
         replace: 'ResourceDisk.SwapSizeMB=1024'
 
-    - name: cloud-init                 | Enable swap for Azure
+    - name: cloud-init                 | Fix cloud-init cleanup
       when: waagent_conf.stat.exists
       replace:
         dest: /usr/lib/python2.7/site-packages/azurelinuxagent/pa/deprovision/default.py
-        regexp: 'self.del_cloud_init(warnings, actions, deluser=deluser)'
-        replace: 'self.del_cloud_init(warnings, actions, include_once=False, deluser=deluser)'
+        regexp:  'warnings, actions, deluser=deluser'
+        replace: 'warnings, actions, include_once=False, deluser=deluser'
 
     - import_tasks: security.yml
     - import_tasks: ovf.yml
