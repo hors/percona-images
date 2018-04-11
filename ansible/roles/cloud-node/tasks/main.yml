@@ -210,6 +210,38 @@
         dest: /var/lib/cloud/scripts/per-boot/resize-xfs
         mode: 0755
 
+    - name: cloud-init                 | stat /etc/waagent.conf
+      stat: path=/etc/waagent.conf
+      register: waagent_conf
+
+    - name: cloud-init                 | Enable cloud-init for Azure
+      when: waagent_conf.stat.exists
+      replace:
+        dest: /etc/waagent.conf
+        regexp: 'Provisioning.UseCloudInit=n'
+        replace: 'Provisioning.UseCloudInit=y'
+
+    - name: cloud-init                 | Enable swap for Azure
+      when: waagent_conf.stat.exists
+      replace:
+        dest: /etc/waagent.conf
+        regexp: 'ResourceDisk.EnableSwap=n'
+        replace: 'ResourceDisk.EnableSwap=y'
+
+    - name: cloud-init                 | Enable swap for Azure
+      when: waagent_conf.stat.exists
+      replace:
+        dest: /etc/waagent.conf
+        regexp: 'ResourceDisk.SwapSizeMB=0'
+        replace: 'ResourceDisk.SwapSizeMB=1024'
+
+    - name: cloud-init                 | Enable swap for Azure
+      when: waagent_conf.stat.exists
+      replace:
+        dest: /usr/lib/python2.7/site-packages/azurelinuxagent/pa/deprovision/default.py
+        regexp: 'self.del_cloud_init(warnings, actions, deluser=deluser)'
+        replace: 'self.del_cloud_init(warnings, actions, include_once=False, deluser=deluser)'
+
     - import_tasks: security.yml
     - import_tasks: ovf.yml
     - import_tasks: VBoxGuestAdditions.yml
