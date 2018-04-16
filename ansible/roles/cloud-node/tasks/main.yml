@@ -14,11 +14,13 @@
       changed_when: False
 
     - name: Data partition             | Create Volume Group
+      when: enable_lvm == true
       lvg:
         vg: DataVG
         pvs: "{{ available_drives.stdout_lines[0] }}"
 
     - name: Data partition             | Create Thin Pool
+      when: enable_lvm == true
       register: thin_pool
       failed_when: "thin_pool | failed and 'Sorry, no shrinking of DataLV to 0 permitted' not in thin_pool.msg"
       lvol:
@@ -27,10 +29,18 @@
         size: 100%FREE
         opts: --thinpool ThinPool -V 1G
 
-    - name: Data partition             | Format
+    - name: Data partition             | Format LVM
+      when: enable_lvm == true
       filesystem:
         fstype: xfs
         dev: /dev/DataVG/DataLV
+        opts: -L DATA
+
+    - name: Data partition             | Format Device
+      when: enable_lvm != true
+      filesystem:
+        fstype: xfs
+        dev: "{{ available_drives.stdout_lines[0] }}"
         opts: -L DATA
 
     - name: Data partition             | Mount
@@ -196,7 +206,8 @@
         regexp: 'update_cmd = default'
         replace: 'update_cmd = minimal-security'
 
-    - name: Data partition             | Auto resize
+    - name: Data partition             | Auto resize LVM
+      when: enable_lvm == true
       copy:
         content: |
           #!/bin/sh
@@ -206,6 +217,18 @@
           pvresize $(ls /dev/sda /dev/sdb /dev/sdc /dev/xvdb 2>/dev/null | grep -v ^$(pvdisplay -c | grep ':VolGroup00:' | cut -d ':' -f 1 | tr -d '[:space:]' | sed 's/[0-9]$//')$ | grep -v ^$(findmnt -f -n -o SOURCE / | sed 's/[0-9]$//')$ | grep -v ^$(findmnt -f -n -o SOURCE /mnt/resource | sed 's/[0-9]$//')$)
           lvextend -l '100%VG' /dev/DataVG/ThinPool
           lvextend -l '80%VG' /dev/DataVG/DataLV
+          xfs_growfs -d {{ data_partition }}
+        dest: /var/lib/cloud/scripts/per-boot/resize-xfs
+        mode: 0755
+
+    - name: Data partition             | Auto resize device
+      when: enable_lvm != true
+      copy:
+        content: |
+          #!/bin/sh
+
+          set -o errexit
+
           xfs_growfs -d {{ data_partition }}
         dest: /var/lib/cloud/scripts/per-boot/resize-xfs
         mode: 0755

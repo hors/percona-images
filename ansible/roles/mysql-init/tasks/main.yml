@@ -68,6 +68,7 @@
           mysql "-p${TEMP_PASS}" --connect-expired-password -e "SET PASSWORD = PASSWORD('$NEW_PASS');"
           echo "[client]
           password = '$NEW_PASS'" > /root/.my.cnf
+          sed -e "s/${TEMP_PASS}/${NEW_PASS}/" -i'' /var/log/mysqld.log
 
           SOURCE=$(
               cat /var/lib/cloud/data/status.json 2>/dev/null \
